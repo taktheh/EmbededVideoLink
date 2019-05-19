@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         EmbededVideoLink
 // @namespace    https://github.com/taktheh/EmbededVideoLink
-// @version      0.4.4
+// @version      0.4.5
 // @description  List up links of embeded videos.
 // @author       Takamaro the Hentai
+// @downloadURL  https://github.com/taktheh/EmbededVideoLink/raw/master/EmbededVideoLink.user.js
 // @include      http://*
 // @include      https://*
 // @exclude      https://drive.google.com/file/d/*
