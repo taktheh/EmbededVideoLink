@@ -1,2 +1,3 @@
 # EmbededVideoLink
-EmbededVideoLink user script
+
+User script to list up embeded media.
