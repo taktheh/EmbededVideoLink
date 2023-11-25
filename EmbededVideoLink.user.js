@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EmbededVideoLink
 // @namespace    https://github.com/taktheh/EmbededVideoLink
-// @version      0.4.6
+// @version      0.5.0
 // @description  List up links of embeded videos.
 // @author       Takamaro the Hentai
 // @downloadURL  https://github.com/taktheh/EmbededVideoLink/raw/master/EmbededVideoLink.user.js
@@ -9,7 +9,7 @@
 // @include      https://*
 // @exclude      https://drive.google.com/file/d/*
 // @exclude      https://disqus.com/*
-// @grant        none
+// @grant        GM_registerMenuCommand
 // ==/UserScript==
 
 (function () {
@@ -24,6 +24,7 @@
     'https://platform.twitter.com'
   ];
   const MSG_MAGIC = "EmVidLi_";
+  const frameHrefs = [];
 
   function getLinkListElement() {
     if (window.EmbededVideoLinkList) {
@@ -54,28 +55,35 @@
     }
   }
 
+  function checkEmbededVideo() {
+    const matches = matchList.map(s => new RegExp(s));
+    const excludes = excludeList.map(s => new RegExp(s));
+    const ul = getLinkListElement();
+
+    frameHrefs.forEach(src => {
+      if (matches.find(r => r.test(src)) && !excludes.find(r => r.test(src))) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+
+        a.href = src;
+        a.textContent = src;
+        a.style.cssText = "font:menu;color:gray;";
+        li.appendChild(a);
+        ul.appendChild(li);
+      }
+    });
+  }
+
   function receiveEmVidLiMessage(event) {
     if (event.data.substr(0, 8) === MSG_MAGIC) {
-      var ul = getLinkListElement();
-      var li = document.createElement("li");
-      var a = document.createElement("a");
-      var src = event.data.substr(8);
-
-      a.href = src;
-      a.textContent = src;
-      a.style.cssText = "font:menu;color:gray;";
-      li.appendChild(a);
-      ul.appendChild(li);
+      frameHrefs.push(event.data.substr(8));
     }
   }
 
   if (top === window.self) {
+    GM_registerMenuCommand("List up embeded video links", checkEmbededVideo);
     window.addEventListener("message", receiveEmVidLiMessage);
   } else {
-    if (matchList.find(s => (new RegExp(s)).test(location.href))) {
-      if (!excludeList.find(s => (new RegExp(s)).test(location.href))) {
-        top.postMessage(MSG_MAGIC + location.href, "*");
-      }
-    }
+    top.postMessage(MSG_MAGIC + location.href, "*");
   }
 })();
